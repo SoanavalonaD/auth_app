@@ -17,6 +17,8 @@ RUN apt-get update && \
     && rm -rf /var/lib/apt/lists/*
 
 # Installation de psycopg2-binary
+# Note : C'est une dépendance système, mais elle est souvent installée via pip
+# ici pour garantir la présence de l'exécutable client pour Alembic/scripts.
 RUN pip install psycopg2-binary
 
 # Définition du répertoire de travail
@@ -40,11 +42,12 @@ ENV UV_HTTP_TIMEOUT=3000
 # Copie des fichiers de configuration
 COPY ./pyproject.toml ./uv.lock ./alembic.ini /app/
 
-# Installation des dépendances du projet (via le lock file)
-# CORRECTION: Suppression de '--frozen' car le lock file est invalide/simulé au début.
-# uv le générera/validera à la place.
+# Installation des dépendances du projet
+# CORRECTION du système de fichiers en lecture seule (Read-only file system):
+# Nous retirons le 'mount' de uv.lock pour permettre à uv de l'écrire 
+# après l'avoir copié dans le conteneur.
+# Nous montons uniquement pyproject.toml car c'est en lecture seule.
 RUN --mount=type=cache,target=/root/.cache/uv \
-    --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     uv sync
 
@@ -57,10 +60,10 @@ COPY ./src /app/src
 COPY ./fixture_data /app/fixture_data
 
 # Synchronisation finale après copie du code 
-# Cette étape est moins nécessaire maintenant que la première étape n'est pas --frozen, 
-# mais je la conserve par prudence pour le dev-dependencies (si le code src affectait les dev deps).
+# Nous utilisons un simple 'uv sync' ici pour capturer les dépendances
+# du projet principal + dev (même si elles sont déjà là).
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync
 
 # Commande par défaut pour démarrer l'API
-CMD ["fastapi", "run", "--host", "0.0.0.0", "--workers", "4", "src/main.py", "--port", "${API_PORT:-8000}"]
+CMD ["fastapi", "run", "--host", "127.0.0.1", "--workers", "4", "src/main.py", "--port", "${API_PORT:-8000}"]
