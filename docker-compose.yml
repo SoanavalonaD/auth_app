@@ -1,7 +1,6 @@
 version: "3.8"
 
 services:
-  # Service de l'API FastAPI
   api:
     build:
       context: .
@@ -11,21 +10,14 @@ services:
       - .env
     ports:
       - "${API_PORT:-8000}:${API_PORT:-8000}"
-    # AJOUT ESSENTIEL: Assurer que le répertoire /app est dans le chemin de recherche Python
     environment:
       PYTHONPATH: /app
     volumes:
-      # Montage complet du code source local dans /app pour le développement
-      # Ceci garantit que alembic.ini et le dossier alembic/ sont accessibles à la racine /app
-      - .:/app
-      # Exclure le .venv local si existant, pour utiliser celui du conteneur
       - /app/.venv
     depends_on:
       - db
-    # Utilisation du chemin explicite vers l'interpréteur Python du .venv
     command: /app/.venv/bin/python -m uvicorn src.main:app --host 127.0.0.1 --port ${API_PORT:-8000}
     
-  # Service de la Base de Données PostgreSQL
   db:
     image: postgres:16-alpine
     container_name: auth_db
