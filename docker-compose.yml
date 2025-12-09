@@ -10,17 +10,12 @@ services:
       - "${API_PORT:-8000}:${API_PORT:-8000}"
     environment:
       PYTHONPATH: /app
-      # ⚠️ RAPPEL : Assurez-vous que DATABASE_URL dans votre .env
-      # utilise 'db' comme hôte, par exemple : 
-      # DATABASE_URL=postgresql+asyncpg://user:password@db:5432/dbname
     volumes:
       - .:/app
       - /app/.venv
     depends_on:
       db:
         condition: service_healthy
-    
-    # 🏆 CHEMIN CORRIGÉ DÉFINITIVEMENT
     entrypoint: ["/app/scripts/entrypoint.sh"] 
     command: /app/.venv/bin/python -m uvicorn src.main:app --host 0.0.0.0 --port ${API_PORT:-8000}
     
@@ -32,7 +27,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - "5433:5432"
+      - "${POSTGRES_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     healthcheck:
