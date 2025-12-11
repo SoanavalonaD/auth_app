@@ -18,6 +18,7 @@ dependencies = [
     "passlib[bcrypt]",
     "python-jose[cryptography]",
     "asyncpg", # Driver pour PostgreSQL
+    "bcrypt==3.2.2",
 ]
 
 # Dépendances de développement (dev-dependencies)
@@ -27,4 +28,11 @@ dev-dependencies = [
     "alembic",
     "ruff", # Ajout de Ruff pour le linter/formatter
     "fastapi-cli", # Ajout du CLI pour l'exécutable 'fastapi run'
+    "pytest",
+    "httpx",
+    "pytest-asyncio",
 ]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
