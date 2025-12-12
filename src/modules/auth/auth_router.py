@@ -4,7 +4,7 @@ from src.modules.auth.auth_app import UserCreate, UserInDB, Token, UserLogin
 from src.modules.auth.auth_app import AuthAppService
 
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 router = APIRouter(
     prefix="/auth",
     tags=["Authentification"],

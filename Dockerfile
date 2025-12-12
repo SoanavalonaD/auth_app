@@ -40,4 +40,4 @@ RUN chmod +x /app/scripts/entrypoint.sh
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync
 
-CMD ["fastapi", "run", "--host", "127.0.0.1", "--workers", "4", "src/main.py", "--port", "${API_PORT:-8000}"]
+CMD ["sh", "-c", "fastapi run --host 0.0.0.0 --port ${API_PORT:-8000} src/main.py"]

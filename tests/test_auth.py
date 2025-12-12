@@ -12,9 +12,9 @@ async def test_root(async_client: AsyncClient):
 async def test_register_user(async_client: AsyncClient):
     payload = {
         "email": "test@example.com",
-        "password": "password123"
+        "password": "Password123"
     }
-    response = await async_client.post("/auth/register", json=payload)
+    response = await async_client.post("/api/v1/auth/register", json=payload)
     assert response.status_code == 201
     data = response.json()
     assert data["email"] == payload["email"]
@@ -26,15 +26,15 @@ async def test_login_user(async_client: AsyncClient):
     # Idéalement on utiliserait une fixture pour créer un user
     payload = {
         "email": "login_test@example.com",
-        "password": "password123"
+        "password": "Password123"
     }
-    await async_client.post("/auth/register", json=payload)
+    await async_client.post("/api/v1/auth/register", json=payload)
 
     login_payload = {
         "email": "login_test@example.com",
-        "password": "password123"
+        "password": "Password123"
     }
-    response = await async_client.post("/auth/login", json=login_payload)
+    response = await async_client.post("/api/v1/auth/login", json=login_payload)
     assert response.status_code == 200
     data = response.json()
     assert "access_token" in data
